@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import ticket.booking.entities.Ticket;
 
 public class UserBookingService {
 
@@ -20,6 +23,7 @@ public class UserBookingService {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String USERS_PATH = "../localdb/user.json";
+
 
     UserBookingService(User user) throws IOException {
         this.user = user;
@@ -32,7 +36,23 @@ public class UserBookingService {
         return foundUser.isPresent();
     }
 
-    public Boolean signupUser(){
+    public Boolean signupUser(User user) throws IOException {
+        userList.add(user);
+        saveUserListToFile();
+        return Boolean.TRUE;
+    }
 
+    private void saveUserListToFile() throws IOException {
+        File usersFile = new File(USERS_PATH);
+        objectMapper.writeValue(usersFile, userList);
+    }
+
+    public void fetchBookings() {
+        user.printTickets();
+    }
+
+    public void CancelTicket(String ticketId){
+        List<Ticket> finalTickets = user.getTicketsBooked().stream().filter((Ticket ticket)-> !ticket.getTicketId().equals(ticketId)).toList();
+        user.setTicketsBooked(finalTickets);
     }
 }
